@@ -22,7 +22,9 @@ func (t JewishDate) String() string {
 	chodashim := [13]string{"Tishri", "Cheshvan", "Kislev", "Tevet", "Shevat", "Adar", "Adar II", "Nisan", "Yiar", "Sivan", "Tamuz", "Av", "Elul"}
 	return fmt.Sprintf("%02d %s %04d", t.Yom, chodashim[t.Chodesh-1], t.Shana)
 }
-func (t JewishDate) Serialize() (int, int, int) {
+
+// Serialize returns the components Shana, Chodesh, Yom.
+func (t JewishDate) Serialize() (Shana int, Chodesh int, Yom int) {
 	return t.Shana, t.Chodesh, t.Yom
 }
 
