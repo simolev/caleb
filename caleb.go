@@ -12,12 +12,12 @@ type JewishDate struct {
 	Yom     int
 }
 
-// Returns a numerical representation of the Jewish date: 5779-07-25
+// Short returns a numerical representation of the Jewish date: 5779-07-25.
 func (t JewishDate) Short() string {
 	return fmt.Sprintf("%02d-%02d-%04d", t.Yom, t.Chodesh, t.Shana)
 }
 
-// Returns a representation of the Jewish date where the month is spelled out: 25 Adar II 5779
+// String returns a representation of the Jewish date where the month is spelled out: 25 Adar II 5779.
 func (t JewishDate) String() string {
 	chodashim := [13]string{"Tishri", "Cheshvan", "Kislev", "Tevet", "Shevat", "Adar", "Adar II", "Nisan", "Yiar", "Sivan", "Tamuz", "Av", "Elul"}
 	return fmt.Sprintf("%02d %s %04d", t.Yom, chodashim[t.Chodesh-1], t.Shana)
@@ -26,12 +26,12 @@ func (t JewishDate) Serialize() (int, int, int) {
 	return t.Shana, t.Chodesh, t.Yom
 }
 
-// MonthsSinceFirstMolad returns the number of months since the very first Molad until the beginning of the passed shana
+// MonthsSinceFirstMolad returns the number of months since the very first Molad until the beginning of the passed shana.
 func MonthsSinceFirstMolad(shana int) (n int) {
 	return int(math.Floor(((float64(shana) * 235) - 234) / 19))
 }
 
-// Shana Mehubberet is year 3, 6, 8, 11, 14, 17, 19 in a 19 year cycle
+// Shana Mehubberet has 13 months instead of 12 and occurs on years 3, 6, 8, 11, 14, 17, 19 of a 19 year cycle.
 func IsMehubberet(shana int) (mehubberet bool) {
 	switch shana % 19 {
 	case 3, 6, 8, 11, 14, 17, 0:
@@ -40,7 +40,7 @@ func IsMehubberet(shana int) (mehubberet bool) {
 	return false
 }
 
-// RoshHashana returns the gregorian day for Rosh Hashana (1st of Tishri) of the passed shana
+// RoshHashana returns the gregorian day for Rosh Hashana (1st of Tishri) of the passed shana.
 func RoshHashana(shana int) (roshHashana time.Time) {
 	var nMonthsSinceFirstMolad int
 	var nChalakim int
@@ -103,13 +103,13 @@ func RoshHashana(shana int) (roshHashana time.Time) {
 	return
 }
 
-// LengthOfYear return the number of days in the passed shana
-func LengthOfYear(shana int) int {
+// DaysInShana return the number of days in the passed shana.
+func DaysInShana(shana int) int {
 	return int(math.Round(RoshHashana(shana+1).Sub(RoshHashana(shana)).Hours() / 24))
 }
 
-// JewishToGregorian accepts a JewishDate struct and returns the corresponding gregorian date in time.Time format
-// Only the date part is relevant, time will be 0 and timezone UTC
+// JewishToGregorian accepts a JewishDate struct and returns the corresponding gregorian date in time.Time format.
+// Only the date part is relevant, time will be 0 and timezone UTC.
 func JewishToGregorian(j JewishDate) (gregorian time.Time) {
 	var nLengthOfYear int
 	var bLeap bool
@@ -121,7 +121,7 @@ func JewishToGregorian(j JewishDate) (gregorian time.Time) {
 
 	shana, chodesh, yom := j.Serialize()
 	bLeap = IsMehubberet(shana)
-	nLengthOfYear = LengthOfYear(shana)
+	nLengthOfYear = DaysInShana(shana)
 
 	// The regular length of a non-leap year is 354 days.
 	// The regular length of a leap year is 384 days.
@@ -182,8 +182,8 @@ func JewishToGregorian(j JewishDate) (gregorian time.Time) {
 	return dGreg
 }
 
-// GregorianToJewish accepts a gregorian date in time.Time format and returns a JewishDate struct
-// Only the date part is relevant, time and timezone are discarded
+// GregorianToJewish accepts a gregorian date in time.Time format and returns a JewishDate struct.
+// Only the date part is relevant, time and timezone are discarded.
 func GregorianToJewish(dGreg time.Time) JewishDate {
 	var nYearH int
 	var nMonthH int
@@ -248,7 +248,7 @@ func GregorianToJewish(dGreg time.Time) JewishDate {
 		nDays = int(math.Round((dGreg.Sub(RoshHashana(nYearH)).Hours() / 24)))
 		// Find out what type of year it is so that we know the length of the
 		// months
-		nLengthOfYear = LengthOfYear(nYearH)
+		nLengthOfYear = DaysInShana(nYearH)
 		bHaser = nLengthOfYear == 353 || nLengthOfYear == 383
 		bShalem = nLengthOfYear == 355 || nLengthOfYear == 385
 		bLeap = IsMehubberet(nYearH)
@@ -297,7 +297,7 @@ func GregorianToJewish(dGreg time.Time) JewishDate {
 	return JewishDate{Shana: nYearH, Chodesh: nMonthH, Yom: nDateH}
 }
 
-// SameDate checks whether the date part of two time.Time objects is the same; time and timezone are not taken into account
+// SameDate checks whether the date part of two time.Time objects is the same; time and timezone are not taken into account.
 func SameDate(d1, d2 time.Time) bool {
 	return d1.Day() == d2.Day() && d1.Month() == d2.Month() && d1.Year() == d2.Year()
 }
